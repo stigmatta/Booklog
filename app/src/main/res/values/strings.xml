@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Booklog</string>
+
+    <string name="discover_books">Discover Books</string>
+    <string name="search_placeholder">Search by title or author…</string>
+    <string name="added_to_library">Added to Library</string>
+    <string name="popular_badge">Popular</string>
+
+    <string name="details_title">Details</string>
+    <string name="tab_notes">Notes</string>
+    <string name="tab_info">Information</string>
+    <string name="label_title">TITLE</string>
+    <string name="label_authors">AUTHORS</string>
+    <string name="label_language">LANGUAGE</string>
+    <string name="label_description">DESCRIPTION</string>
+    <string name="no_description">No description available.</string>
+    <string name="book_not_found">Book not found</string>
+    <string name="unknown_author">Unknown author</string>
+
+
+    <string name="btn_edit">EDIT</string>
+    <string name="btn_back">Back</string>
+
+    <string-array name="book_genres">
+        <item>Fiction</item>
+        <item>Fantasy</item>
+        <item>Mystery</item>
+        <item>History</item>
+        <item>Science</item>
+        <item>Classic</item>
+        <item>Computers</item>
+        <item>Psychology</item>
+        <item>Business</item>
+        <item>Philosophy</item>
+        <item>Art</item>
+        <item>Travel</item>
+        <item>Biography</item>
+        <item>Cooking</item>
+    </string-array>
+</resources>
