@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.extended)

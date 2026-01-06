@@ -1,6 +1,5 @@
-package site.odintsov.booklog.ui.pages
+package site.odintsov.booklog.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,12 +25,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -40,10 +41,12 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
+import site.odintsov.booklog.ui.components.GenreChip
+import site.odintsov.booklog.ui.components.InfoContent
+import site.odintsov.booklog.ui.components.StatusSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +54,8 @@ fun BookDetailScreen(
     book: Book?,
     onBack: () -> Unit
 ) {
+    var selectedTab by remember { mutableIntStateOf(0) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -116,24 +121,6 @@ fun BookDetailScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            repeat(4) {
-                                Icon(
-                                    Icons.Default.Star,
-                                    null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                            Text(
-                                text = " 4.41 (77)",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Row {
@@ -145,48 +132,27 @@ fun BookDetailScreen(
                 }
 
                 SecondaryTabRow(
-                    selectedTabIndex = 1,
+                    selectedTabIndex = selectedTab,
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary,
                     divider = { HorizontalDivider() }
                 ) {
                     Tab(
-                        selected = false,
-                        onClick = {},
-                        text = {
-                            Text(
-                                stringResource(R.string.tab_notes),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = { Text(stringResource(R.string.reading_status)) }
                     )
                     Tab(
-                        selected = true,
-                        onClick = {},
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
                         text = { Text(stringResource(R.string.tab_info)) }
                     )
                 }
 
-                Column(modifier = Modifier.padding(16.dp)) {
-                    InfoSection(label = stringResource(R.string.label_title), value = book.title)
-                    InfoSection(label = stringResource(R.string.label_authors), value = book.author)
-                    InfoSection(label = stringResource(R.string.label_language), value = "English")
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = stringResource(R.string.label_description),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = book.description ?: stringResource(R.string.no_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 20.sp
-                    )
+                if (selectedTab == 0) {
+                    StatusSection()
+                } else {
+                    InfoContent(book)
                 }
             }
         } else {
@@ -197,36 +163,3 @@ fun BookDetailScreen(
     }
 }
 
-@Composable
-fun GenreChip(text: String) {
-    Surface(
-        shape = RoundedCornerShape(4.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-fun InfoSection(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
