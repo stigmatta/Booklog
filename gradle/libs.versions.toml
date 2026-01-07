@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.2"
+animation = "1.7.0"
 coil = "3.0.4"
 converterGson = "3.0.0"
 kotlin = "2.0.21"
@@ -19,6 +20,7 @@ material3 = "1.4.0"
 runtime = "1.10.0"
 
 [libraries]
+androidx-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
