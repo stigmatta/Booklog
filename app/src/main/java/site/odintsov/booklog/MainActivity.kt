@@ -3,6 +3,8 @@ package site.odintsov.booklog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,8 +27,11 @@ import site.odintsov.booklog.data.local.AppDatabase
 import site.odintsov.booklog.ui.BookViewModel
 import site.odintsov.booklog.ui.screens.BookDetailScreen
 import site.odintsov.booklog.ui.screens.BookScreen
+import site.odintsov.booklog.ui.screens.LibraryScreen
+import site.odintsov.booklog.ui.screens.ProfileScreen
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,6 +48,7 @@ class MainActivity : ComponentActivity() {
 
         viewModel.getPopularBooks()
 
+
         setContent {
             val systemDark = isSystemInDarkTheme()
             var isDarkTheme by remember { mutableStateOf(systemDark) }
@@ -52,30 +58,66 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    NavHost(navController = navController, startDestination = "book_list") {
-                        composable("book_list") {
-                            BookScreen(
-                                viewModel = viewModel,
-                                onBookClick = { book ->
-                                    navController.navigate("book_details/${book.id}")
-                                },
-                                isDarkTheme = isDarkTheme,
-                                onThemeToggle = { isDarkTheme = it },
-                            )
-                        }
+                    SharedTransitionLayout {
+                        NavHost(navController = navController, startDestination = "book_list") {
+                            composable("book_list") {
+                                BookScreen(
+                                    viewModel = viewModel,
+                                    onBookClick = { book ->
+                                        navController.navigate("book_details/${book.id}")
+                                    },
+                                    isDarkTheme = isDarkTheme,
+                                    onThemeToggle = { isDarkTheme = it },
+                                    onProfileClick = {
+                                        navController.navigate("profile")
+                                    },
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@composable
+                                )
+                            }
 
-                        composable(
-                            route = "book_details/{bookId}",
-                            arguments = listOf(navArgument("bookId") { type = NavType.IntType })
-                        ) { backStackEntry ->
-                            val bookId = backStackEntry.arguments?.getInt("bookId")
-                            val book =
-                                viewModel.allBooks.observeAsState().value?.find { it.id == bookId }
+                            composable(
+                                route = "book_details/{bookId}",
+                                arguments = listOf(navArgument("bookId") {
+                                    type = NavType.StringType
+                                })
+                            ) { backStackEntry ->
+                                val bookId = backStackEntry.arguments?.getString("bookId")
 
-                            BookDetailScreen(
-                                book = book,
-                                onBack = { navController.popBackStack() }
-                            )
+                                val discoverBooks by viewModel.allBooks.observeAsState(initial = emptyList())
+                                val libraryBooks by viewModel.libraryBooks.observeAsState(initial = emptyList())
+
+                                val book = libraryBooks.find { it.id == bookId }
+                                    ?: discoverBooks.find { it.id == bookId }
+
+                                BookDetailScreen(
+                                    book = book,
+                                    viewModel = viewModel,
+                                    onBack = { navController.popBackStack() },
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@composable
+                                )
+                            }
+
+                            composable("library") {
+                                LibraryScreen(
+                                    viewModel = viewModel,
+                                    onBookClick = { book -> navController.navigate("book_details/${book.id}") },
+                                    onBack = { navController.popBackStack() },
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this@composable
+                                )
+                            }
+
+                            composable("profile") {
+                                ProfileScreen(
+                                    viewModel = viewModel,
+                                    onNavigateToLibrary = {
+                                        navController.navigate("library")
+                                    },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
                         }
                     }
                 }

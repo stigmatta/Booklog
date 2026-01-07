@@ -1,5 +1,8 @@
 package site.odintsov.booklog.ui.screens
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,15 +47,19 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
+import site.odintsov.booklog.ui.BookViewModel
 import site.odintsov.booklog.ui.components.GenreChip
 import site.odintsov.booklog.ui.components.InfoContent
 import site.odintsov.booklog.ui.components.StatusSection
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun BookDetailScreen(
     book: Book?,
-    onBack: () -> Unit
+    viewModel: BookViewModel,
+    onBack: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -98,12 +105,20 @@ fun BookDetailScreen(
                         modifier = Modifier.size(width = 120.dp, height = 180.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
-                        AsyncImage(
-                            model = book.imageUrl,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                        with(sharedTransitionScope) {
+                            AsyncImage(
+                                model = book.imageUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .sharedElement(
+                                        rememberSharedContentState(key = "img-${book.id}"),
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
                     }
 
                     Spacer(modifier = Modifier.width(20.dp))
@@ -150,7 +165,32 @@ fun BookDetailScreen(
                 }
 
                 if (selectedTab == 0) {
-                    StatusSection()
+                    StatusSection(
+                        initialStatus = book.status,
+                        initialProgress = book.readingProgress,
+                        initialRating = book.rating,
+                        isInLibrary = book.isInLibrary,
+                        onSave = { newStatus, newProgress, newRating ->
+                            val updatedBook = book.copy(
+                                status = newStatus,
+                                readingProgress = newProgress,
+                                rating = newRating,
+                                isInLibrary = true
+                            )
+                            viewModel.updateBookInLibrary(updatedBook)
+                            onBack()
+                        },
+                        onDelete = {
+                            val resetBook = book.copy(
+                                status = 0,
+                                isInLibrary = false,
+                                readingProgress = 0f,
+                                rating = 0
+                            )
+                            viewModel.updateBookInLibrary(resetBook)
+                            onBack()
+                        }
+                    )
                 } else {
                     InfoContent(book)
                 }

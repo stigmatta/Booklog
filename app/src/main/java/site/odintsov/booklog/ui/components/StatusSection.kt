@@ -3,6 +3,7 @@ package site.odintsov.booklog.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,15 +16,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.StarOutline
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,10 +47,19 @@ import site.odintsov.booklog.R
 import kotlin.math.roundToInt
 
 @Composable
-fun StatusSection() {
-    var statusIndex by remember { mutableIntStateOf(0) } // 0: Wishlist, 1: Read
-    var progress by remember { mutableFloatStateOf(0f) }
-    var rating by remember { mutableIntStateOf(0) }
+fun StatusSection(
+    initialStatus: Int,
+    initialProgress: Float,
+    initialRating: Int,
+    isInLibrary: Boolean,
+    onSave: (Int, Float, Int) -> Unit,
+    onDelete: () -> Unit
+) {
+    var statusIndex by remember { mutableIntStateOf(initialStatus) }
+    var progress by remember { mutableFloatStateOf(initialProgress) }
+    var rating by remember { mutableIntStateOf(initialRating) }
+
+    val isRead = statusIndex == 2
 
     Card(
         modifier = Modifier
@@ -60,7 +74,6 @@ fun StatusSection() {
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,21 +84,29 @@ fun StatusSection() {
                 StatusSegment(
                     text = stringResource(R.string.status_wishlist),
                     icon = Icons.Default.FavoriteBorder,
-                    isSelected = statusIndex == 0,
-                    onClick = { statusIndex = 0 },
+                    isSelected = statusIndex == 1,
+                    onClick = {
+                        statusIndex = 1
+                        progress = 0f
+                    },
                     modifier = Modifier.weight(1f)
                 )
 
                 VerticalDivider(
-                    modifier = Modifier.width(1.dp).fillMaxHeight(0.6f),
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight(0.6f),
                     color = MaterialTheme.colorScheme.outlineVariant
                 )
 
                 StatusSegment(
                     text = stringResource(R.string.status_isRead),
                     icon = Icons.Default.CheckCircle,
-                    isSelected = statusIndex == 1,
-                    onClick = { statusIndex = 1 },
+                    isSelected = statusIndex == 2,
+                    onClick = {
+                        statusIndex = 2
+                        progress = 1f
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -93,15 +114,12 @@ fun StatusSection() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "YOUR RATING",
+                text = stringResource(R.string.your_rating),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -110,12 +128,13 @@ fun StatusSection() {
                     val isSelected = index < rating
                     Icon(
                         imageVector = if (isSelected) Icons.Default.Star else Icons.Rounded.StarOutline,
-                        contentDescription = "Rate ${index + 1}",
+                        contentDescription = null,
                         modifier = Modifier
                             .size(42.dp)
                             .clip(CircleShape)
                             .clickable { rating = index + 1 },
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.outlineVariant
                     )
                 }
             }
@@ -127,27 +146,56 @@ fun StatusSection() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
+                Text(text = stringResource(R.string.reading_progress))
                 Text(
-                    text = stringResource(R.string.reading_progress),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "${(progress * 100).roundToInt()}%",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    text = if (isRead) "100%" else "${(progress * 100).roundToInt()}%",
+                    color = if (isRead) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             Slider(
-                value = progress,
-                onValueChange = { progress = it },
+                value = if (isRead) 1f else progress,
+                onValueChange = {
+                    if (!isRead) {
+                        progress = it
+                        statusIndex = if (it > 0f) 3 else 1
+                    }
+                },
+                enabled = !isRead,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { onSave(statusIndex, progress, rating) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(12.dp)
+            ) {
+                Text(text = stringResource(R.string.btn_add_to_library))
+            }
+
+            if (isInLibrary) {
+                TextButton(
+                    onClick = onDelete,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(text = stringResource(R.string.btn_remove_from_library))
+                }
+            }
         }
     }
 }
-

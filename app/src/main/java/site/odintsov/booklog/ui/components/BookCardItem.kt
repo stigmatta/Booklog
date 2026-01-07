@@ -1,5 +1,8 @@
 package site.odintsov.booklog.ui.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,8 +34,15 @@ import coil3.compose.AsyncImage
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun BookCardItem(book: Book, onAdd: () -> Unit, onClick: () -> Unit) {
+fun BookCardItem(
+    book: Book,
+    onAdd: () -> Unit,
+    onClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,14 +60,20 @@ fun BookCardItem(book: Book, onAdd: () -> Unit, onClick: () -> Unit) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = book.imageUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(width = 60.dp, height = 90.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    model = book.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(width = 60.dp, height = 90.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(key = "img-${book.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        ),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 

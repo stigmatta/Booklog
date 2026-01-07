@@ -1,5 +1,8 @@
 package site.odintsov.booklog.ui.screens
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,18 +44,22 @@ import kotlinx.coroutines.launch
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
 import site.odintsov.booklog.ui.BookViewModel
+import site.odintsov.booklog.ui.components.AddToLibraryDialog
 import site.odintsov.booklog.ui.components.BookCardItem
 import site.odintsov.booklog.ui.components.BookSearchBar
 import site.odintsov.booklog.ui.components.BookTopAppBar
 import site.odintsov.booklog.ui.components.GenreFilterBar
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun BookScreen(
     viewModel: BookViewModel,
     onBookClick: (Book) -> Unit,
     isDarkTheme: Boolean,
     onThemeToggle: (Boolean) -> Unit,
+    onProfileClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val books by viewModel.allBooks.observeAsState(initial = emptyList())
     val snackbarHostState = remember { SnackbarHostState() }
@@ -65,13 +72,38 @@ fun BookScreen(
 
     var searchQuery by remember { mutableStateOf("") }
 
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedBookForDialog by remember { mutableStateOf<Book?>(null) }
+
+    if (showDialog && selectedBookForDialog != null) {
+        AddToLibraryDialog(
+            onDismiss = { showDialog = false },
+            onConfirm = { selectedStatus ->
+                val updatedBook = selectedBookForDialog!!.copy(
+                    status = selectedStatus,
+                    isInLibrary = true,
+                    readingProgress = if (selectedStatus == 2) 1.0f else 0.0f
+                )
+
+                viewModel.updateBookInLibrary(updatedBook)
+
+                showDialog = false
+                selectedBookForDialog = null
+
+                scope.launch {
+                    snackbarHostState.showSnackbar(addedMessage)
+                }
+            }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
                 Spacer(modifier = Modifier.height(12.dp))
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.tab_info)) },
+                    label = { Text(stringResource(R.string.tab_side_panel)) },
                     selected = false,
                     onClick = { scope.launch { drawerState.close() } },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -82,7 +114,8 @@ fun BookScreen(
                     label = { Text(stringResource(R.string.dark_mode)) },
                     icon = {
                         Icon(
-                            if (isDarkTheme) Icons.Default.DarkMode else Icons.Default.LightMode,
+                            if (isDarkTheme) Icons.Default.DarkMode
+                            else Icons.Default.LightMode,
                             null
                         )
                     },
@@ -106,7 +139,7 @@ fun BookScreen(
                     titleRes = R.string.discover_books,
                     drawerState = drawerState,
                     scope = scope,
-                    onProfileClick = { }
+                    onProfileClick = { onProfileClick() }
                 )
             },
             containerColor = MaterialTheme.colorScheme.background
@@ -142,12 +175,12 @@ fun BookScreen(
                             BookCardItem(
                                 book = book,
                                 onAdd = {
-                                    viewModel.insert(book)
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(addedMessage)
-                                    }
+                                    selectedBookForDialog = book
+                                    showDialog = true
                                 },
-                                onClick = { onBookClick(book) }
+                                onClick = { onBookClick(book) },
+                                sharedTransitionScope = sharedTransitionScope,
+                                animatedVisibilityScope = animatedVisibilityScope
                             )
                         }
                     }
