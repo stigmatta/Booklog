@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">Booklog</string>
+    <string name="discover_books">Обзор книг</string>
+    <string name="search_placeholder">Поиск по названию</string>
+    <string name="added_to_library">Добавлено в библиотеку</string>
+    <string name="popular_badge">Популярное</string>
+    <string name="details_title">Детали</string>
+    <string name="tab_notes">Заметки</string>
+    <string name="tab_side_panel">Боковая панель</string>
+    <string name="tab_info">Информация</string>
+    <string name="tab_reviews">Отзывы</string>
+    <string name="rating_summary">Итоги рейтинга</string>
+    <string name="user_reviews">Отзывы пользователей</string>
+    <string name="no_reviews">Отзывов пока нет.</string>
+    <string name="based_on_ratings">На основе %d оценок</string>
+    <string name="label_title">НАЗВАНИЕ</string>
+    <string name="label_authors">АВТОРЫ</string>
+    <string name="label_language">ЯЗЫК</string>
+    <string name="label_description">ОПИСАНИЕ</string>
+    <string name="no_description">Описание отсутствует.</string>
+    <string name="book_not_found">Книга не найдена</string>
+    <string name="empty_library">В библиотеке пока нет книг!</string>
+    <string name="unknown_author">Неизвестный автор</string>
+    <string name="open_sidebar">Открыть панель</string>
+    <string name="profile">Профиль</string>
+    <string name="reading_status">Статус чтения</string>
+    <string name="status_wishlist">Хочу прочитать</string>
+    <string name="status_isRead">Прочитано</string>
+    <string name="status_isReading">Читаю сейчас</string>
+    <string name="reading_progress">Прогресс чтения</string>
+    <string name="your_rating">ВАША ОЦЕНКА</string>
+    <string name="dark_mode">Темная тема</string>
+    <string name="my_library">Моя библиотека</string>
+    <string name="my_profile">Мой профиль</string>
+    <string name="my_profile_overall">Всего книг</string>
+    <string name="average_rating_stat">Качество чтения</string>
+    <string name="overall_stats">Статистика</string>
+    <string name="my_challenge">Мой вызов</string>
+    <string name="book_challenge">Книжный вызов 2026</string>
+    <string name="goal_achieved">Цель достигнута</string>
+    <string name="email">Электронная почта</string>
+    <string name="password">Пароль</string>
+    <string name="dont_have_account">Нет аккаунта? Регистрация</string>
+    <string name="already_have_account">Уже есть аккаунт? Войти</string>
+    <string name="my_reviews">Мои отзывы</string>
+
+    <string name="create_account">Создать аккаунт</string>
+    <string name="user_name">Имя</string>
+    <string name="btn_sign_up">Зарегистрироваться</string>
+    <string name="btn_login">Войти</string>
+    <string name="btn_logout">Выйти</string>
+    <string name="btn_edit">РЕДАКТИРОВАТЬ</string>
+    <string name="btn_back">Назад</string>
+    <string name="btn_update_book">Обновить статус книги</string>
+    <string name="btn_add_to_library">Добавить в библиотеку</string>
+    <string name="btn_remove_from_library">Удалить из библиотеки</string>
+
+    <string-array name="book_genres">
+        <item>Художественная литература</item>
+        <item>Фэнтези</item>
+        <item>Детектив</item>
+        <item>История</item>
+        <item>Наука</item>
+        <item>Классика</item>
+        <item>Компьютеры</item>
+        <item>Психология</item>
+        <item>Бизнес</item>
+        <item>Философия</item>
+        <item>Искусство</item>
+        <item>Путешествия</item>
+        <item>Биография</item>
+        <item>Кулинария</item>
+    </string-array>
+</resources>

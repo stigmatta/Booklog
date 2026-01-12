@@ -310,7 +310,7 @@ fun ProfileScreen(
             
             if (userReviews.isNotEmpty()) {
                 Text(
-                    text = "My Reviews",
+                    text = stringResource(R.string.my_reviews),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.Start)
                 )
@@ -356,7 +356,7 @@ fun ProfileScreen(
             ) {
                 Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Logout")
+                Text(stringResource(R.string.btn_logout))
             }
             Spacer(modifier = Modifier.height(32.dp))
         }

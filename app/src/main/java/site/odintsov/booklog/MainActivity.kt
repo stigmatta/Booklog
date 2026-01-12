@@ -1,8 +1,9 @@
 package site.odintsov.booklog
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,7 +36,8 @@ import site.odintsov.booklog.ui.screens.LoginScreen
 import site.odintsov.booklog.ui.screens.ProfileScreen
 import site.odintsov.booklog.ui.screens.SignUpScreen
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +68,7 @@ class MainActivity : ComponentActivity() {
             var isDarkTheme by remember { mutableStateOf(systemDark) }
 
             val colors = if (isDarkTheme) darkColorScheme() else lightColorScheme()
+
             MaterialTheme(colorScheme = colors) {
                 val navController = rememberNavController()
                 val isLoggedIn = authRepository.currentUser != null
@@ -77,9 +80,15 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                val currentLocale = remember { mutableStateOf(AppCompatDelegate.getApplicationLocales()) }
+                LaunchedEffect(currentLocale.value) {
+                    viewModel.getPopularBooks()
+                }
+
                 Surface(color = MaterialTheme.colorScheme.background) {
                     SharedTransitionLayout {
                         NavHost(navController = navController, startDestination = startDest) {
+
                             composable("login") {
                                 LoginScreen(
                                     viewModel = authViewModel,

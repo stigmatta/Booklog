@@ -1,10 +1,10 @@
 package site.odintsov.booklog.data
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -23,11 +23,18 @@ class BookRepository(private val bookDao: BookDao) {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    suspend fun resetLibrary() {
-        bookDao.resetAllBooks()
+    fun getSystemLanguage(): String {
+        val appLocales = AppCompatDelegate.getApplicationLocales()
+        if (!appLocales.isEmpty) {
+            return appLocales[0]?.language ?: "en"
+        }
+
+        return "en"
     }
 
-    suspend fun fetchPopularBooks(query: String, langRestrict: String? = null) {
+    suspend fun fetchPopularBooks(query: String) {
+
+        val currentLang = getSystemLanguage()
         withContext(Dispatchers.IO) {
             try {
                 bookDao.invalidateSearchResults()
@@ -35,7 +42,8 @@ class BookRepository(private val bookDao: BookDao) {
                 val response = googleApi.searchBooks(
                     query = query,
                     orderBy = "relevance",
-                    langRestrict = langRestrict
+                    lang = currentLang,
+                    interfaceLang = currentLang
                 )
 
                 val items = response.items ?: emptyList()
@@ -105,32 +113,11 @@ class BookRepository(private val bookDao: BookDao) {
         }
     }
 
-    suspend fun insert(book: Book) {
-        bookDao.insertBook(book)
-    }
-
-    suspend fun delete(book: Book) {
-        bookDao.deleteBook(book)
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            try {
-                firestore.collection("users")
-                    .document(userId)
-                    .collection("books")
-                    .document(book.id)
-                    .delete()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 
     fun getLibraryBooks() {
         bookDao.getLibraryBooks()
     }
 
-    fun getBookById(id: String): LiveData<Book?> = bookDao.getBookById(id)
-    
     suspend fun saveBookToLibrary(book: Book) {
         bookDao.upsertBook(book)
         val userId = auth.currentUser?.uid

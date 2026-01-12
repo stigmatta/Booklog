@@ -45,8 +45,6 @@ class BookViewModel(application: Application, private val repository: BookReposi
     val selectedGenre: State<String> = _selectedGenre
 
     private val _selectedLanguage = mutableStateOf(languages.first())
-    val selectedLanguage: State<Pair<String, String?>> = _selectedLanguage
-
     private val _isLoading = mutableStateOf(false)
 
     val isLoading: State<Boolean> = _isLoading
@@ -64,26 +62,25 @@ class BookViewModel(application: Application, private val repository: BookReposi
 
     fun onGenreSelected(genre: String) {
         _selectedGenre.value = genre
-        getPopularBooks("subject:${genre.lowercase()}")
+        getPopularBooks(genre)
     }
 
-    fun onLanguageSelected(language: Pair<String, String?>) {
-        _selectedLanguage.value = language
-        getPopularBooks()
-    }
+    fun getPopularBooks(genre: String? = null) {
+        val genreToUse = genre ?: _selectedGenre.value
+        val mappedGenre = mapGenreToApiQuery(genreToUse)
+        val finalQuery = "subject:${mappedGenre.lowercase()}"
 
-    fun getPopularBooks(
-        query: String = "subject:${_selectedGenre.value.lowercase()}",
-        langRestrict: String? = _selectedLanguage.value.second
-    ) =
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.fetchPopularBooks(query, langRestrict)
+                repository.fetchPopularBooks(finalQuery)
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
                 _isLoading.value = false
             }
         }
+    }
 
     fun getLibraryBooks() = viewModelScope.launch {
         repository.getLibraryBooks()
@@ -146,8 +143,6 @@ class BookViewModel(application: Application, private val repository: BookReposi
     
     fun deleteReview(review: Map<String, Any>) {
         val id = review["id"] as? String ?: return
-        val bookId = review["bookId"] as? String
-        val userId = review["userId"] as? String
 
         viewModelScope.launch {
             repository.deleteReview(id)
@@ -159,11 +154,28 @@ class BookViewModel(application: Application, private val repository: BookReposi
             // Here we just remove from local lists for immediate feedback.
             _reviews.removeIf { it["id"] == id }
             _userReviews.removeIf { it["id"] == id }
-            
-            if (bookId != null) {
-                // If we could find the book object, we could recalc combined rating.
-                // For now, next time user visits book page it will refresh.
-            }
+
+        }
+    }
+
+    private fun mapGenreToApiQuery(localizedGenre: String): String {
+        return when (localizedGenre) {
+            "Художня література", "Художественная литература", "Fiction" -> "Fiction"
+            "Фентезі", "Фэнтези", "Fantasy" -> "Fantasy"
+            "Детектив", "Mystery" -> "Mystery"
+            "Історія", "История", "History" -> "History"
+            "Наука", "Science" -> "Science"
+            "Класика", "Классика", "Classic" -> "Classics"
+            "Комп’ютери", "Компьютеры", "Computers" -> "Computers"
+            "Психологія", "Психология", "Psychology" -> "Psychology"
+            "Бізнес", "Бизнес", "Business" -> "Business"
+            "Філософія", "Философия", "Philosophy" -> "Philosophy"
+            "Мистецтво", "Искусство", "Art" -> "Art"
+            "Подорожі", "Путешествия", "Travel" -> "Travel"
+            "Біографія", "Биография", "Biography" -> "Biography"
+            "Кулінарія", "Кулинария", "Cooking" -> "Cooking"
+
+            else -> localizedGenre
         }
     }
 }

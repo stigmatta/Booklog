@@ -38,12 +38,24 @@
     <string name="my_challenge">My challenge</string>
     <string name="book_challenge">Book challenge 2026</string>
     <string name="goal_achieved">Goal achieved</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="dont_have_account">Don\'t have an account? Sign up</string>
+    <string name="already_have_account">Already have an account? Login</string>
 
+    <string name="create_account">Create Account</string>
+    <string name="user_name">Name</string>
+    <string name="my_reviews">My Reviews</string>
 
+    <string name="btn_sign_up">Sign Up</string>
+    <string name="btn_login">Login</string>
     <string name="btn_edit">EDIT</string>
     <string name="btn_back">Back</string>
     <string name="btn_add_to_library">Add to Library</string>
+    <string name="btn_update_book">Update book`s status</string>
     <string name="btn_remove_from_library">Remove from Library</string>
+    <string name="btn_logout">Logout</string>
+
 
 
     <string-array name="book_genres">

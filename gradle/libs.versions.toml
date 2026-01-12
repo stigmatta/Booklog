@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.2"
 animation = "1.7.0"
+appcompat = "1.7.0"
 coil = "3.0.4"
 converterGson = "3.0.0"
 kotlin = "2.0.21"
@@ -11,6 +12,7 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2024.09.00"
+material = "1.12.0"
 navigationCompose = "2.9.6"
 retrofit = "3.0.0"
 roomCommonJvm = "2.8.4"
@@ -24,6 +26,7 @@ coroutinesPlayServices = "1.9.0"
 awsS3 = "2.75.0"
 
 [libraries]
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +54,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

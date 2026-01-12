@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">Booklog</string>
+    <string name="discover_books">Огляд книг</string>
+    <string name="search_placeholder">Пошук за назвою</string>
+    <string name="added_to_library">Додано до бібліотеки</string>
+    <string name="popular_badge">Популярне</string>
+    <string name="details_title">Деталі</string>
+    <string name="tab_notes">Нотатки</string>
+    <string name="tab_side_panel">Бічна панель</string>
+    <string name="tab_info">Інформація</string>
+    <string name="tab_reviews">Відгуки</string>
+    <string name="rating_summary">Підсумок рейтингу</string>
+    <string name="user_reviews">Відгуки користувачів</string>
+    <string name="no_reviews">Відгуків ще немає.</string>
+    <string name="based_on_ratings">На основі %d оцінок</string>
+    <string name="label_title">НАЗВА</string>
+    <string name="label_authors">АВТОРИ</string>
+    <string name="label_language">МОВА</string>
+    <string name="label_description">ОПИС</string>
+    <string name="no_description">Опис відсутній.</string>
+    <string name="book_not_found">Книгу не знайдено</string>
+    <string name="empty_library">У бібліотеці поки немає книг!</string>
+    <string name="unknown_author">Невідомий автор</string>
+    <string name="open_sidebar">Відкрити панель</string>
+    <string name="profile">Профіль</string>
+    <string name="reading_status">Статус читання</string>
+    <string name="status_wishlist">Хочу прочитати</string>
+    <string name="status_isRead">Прочитано</string>
+    <string name="status_isReading">Читаю зараз</string>
+    <string name="reading_progress">Прогрес читання</string>
+    <string name="your_rating">ВАША ОЦІНКА</string>
+    <string name="dark_mode">Темна тема</string>
+    <string name="my_library">Моя бібліотека</string>
+    <string name="my_profile">Мій профіль</string>
+    <string name="my_profile_overall">Всього книг</string>
+    <string name="average_rating_stat">Якість читання</string>
+    <string name="overall_stats">Статистика</string>
+    <string name="my_challenge">Мій виклик</string>
+    <string name="book_challenge">Книжковий виклик 2026</string>
+    <string name="goal_achieved">Ціль досягнута</string>
+    <string name="email">Електронна пошта</string>
+    <string name="password">Пароль</string>
+    <string name="dont_have_account">Немає акаунту? Реєстрація</string>
+    <string name="already_have_account">Вже є акаунт? Увійти</string>
+    <string name="my_reviews">Мої рецензії</string>
+    <string name="create_account">Створити акаунт</string>
+    <string name="user_name">Ім’я</string>
+
+    <string name="btn_logout">Вийти</string>
+    <string name="btn_sign_up">Зареєструватися</string>
+    <string name="btn_login">Увійти</string>
+    <string name="btn_edit">РЕДАГУВАТИ</string>
+    <string name="btn_back">Назад</string>
+    <string name="btn_update_book">Оновити статус книги</string>
+    <string name="btn_add_to_library">Додати до бібліотеки</string>
+    <string name="btn_remove_from_library">Видалити з бібліотеки</string>
+
+    <string-array name="book_genres">
+        <item>Художня література</item>
+        <item>Фентезі</item>
+        <item>Детектив</item>
+        <item>Історія</item>
+        <item>Наука</item>
+        <item>Класика</item>
+        <item>Комп’ютери</item>
+        <item>Психологія</item>
+        <item>Бізнес</item>
+        <item>Філософія</item>
+        <item>Мистецтво</item>
+        <item>Подорожі</item>
+        <item>Біографія</item>
+        <item>Кулінарія</item>
+    </string-array>
+</resources>

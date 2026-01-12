@@ -23,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import site.odintsov.booklog.R
 import site.odintsov.booklog.ui.AuthViewModel
 
 @Composable
@@ -60,7 +62,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true
@@ -69,7 +71,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -94,11 +96,11 @@ fun LoginScreen(
                     onClick = { viewModel.login(email, password, onLoginSuccess) },
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("Login")
+                    Text(stringResource(R.string.btn_login))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(onClick = onNavigateToSignup) {
-                    Text("Don't have an account? Sign up")
+                    Text(stringResource(R.string.dont_have_account))
                 }
             }
         }

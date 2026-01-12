@@ -1,5 +1,6 @@
 package site.odintsov.booklog.ui.screens
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -38,8 +39,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.launch
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
@@ -49,7 +52,6 @@ import site.odintsov.booklog.ui.components.BookCardItem
 import site.odintsov.booklog.ui.components.BookSearchBar
 import site.odintsov.booklog.ui.components.BookTopAppBar
 import site.odintsov.booklog.ui.components.GenreFilterBar
-import site.odintsov.booklog.ui.components.LanguageFilterBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -67,10 +69,10 @@ fun BookScreen(
     val scope = rememberCoroutineScope()
     val isLoading by viewModel.isLoading
     val selectedGenre by viewModel.selectedGenre
-    val selectedLanguage by viewModel.selectedLanguage
     val searchString = selectedGenre.lowercase()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val addedMessage = stringResource(R.string.added_to_library)
+    val genres = stringArrayResource(R.array.book_genres).toList()
 
     var searchQuery by remember { mutableStateOf("") }
 
@@ -131,6 +133,29 @@ fun BookScreen(
                     onClick = { onThemeToggle(!isDarkTheme) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                val languages = listOf(
+                    "English" to "en",
+                    "Русский" to "ru",
+                    "Українська" to "uk"
+                )
+
+                val currentLanguageCode = AppCompatDelegate.getApplicationLocales()[0]?.language ?: "en"
+
+                languages.forEach { (name, code) ->
+                    NavigationDrawerItem(
+                        label = { Text(name) },
+                        selected = currentLanguageCode == code,
+                        onClick = {
+                            val appLocale = LocaleListCompat.forLanguageTags(code)
+                            AppCompatDelegate.setApplicationLocales(appLocale)
+                            scope.launch { drawerState.close() }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
             }
         }
     ) {
@@ -162,15 +187,9 @@ fun BookScreen(
                 )
 
                 GenreFilterBar(
-                    genres = viewModel.genres,
+                    genres = genres,
                     selectedGenre = searchString,
                     onGenreSelected = { genre -> viewModel.onGenreSelected(genre) }
-                )
-
-                LanguageFilterBar(
-                    languages = viewModel.languages,
-                    selectedLanguage = selectedLanguage,
-                    onLanguageSelected = { language -> viewModel.onLanguageSelected(language) }
                 )
 
                 Box(

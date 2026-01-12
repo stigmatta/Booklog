@@ -14,7 +14,8 @@ interface GoogleBooksApi {
         @Query("orderBy") orderBy: String = "relevance",
         @Query("maxResults") maxResults: Int = 20,
         @Query("printType") printType: String = "books",
-        @Query("langRestrict") langRestrict: String? = null
+        @Query("langRestrict") lang: String? = null,
+        @Query("hl") interfaceLang: String? = "ru",
     ): GoogleBooksResponse
 
     companion object {
