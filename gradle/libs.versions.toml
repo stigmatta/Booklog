@@ -18,6 +18,10 @@ roomVersion = "2.6.1"
 runtimeLivedata = "1.10.0"
 material3 = "1.4.0"
 runtime = "1.10.0"
+googleServices = "4.4.2"
+firebaseBom = "33.7.0"
+coroutinesPlayServices = "1.9.0"
+awsS3 = "2.75.0"
 
 [libraries]
 androidx-compose-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
@@ -49,9 +53,15 @@ androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name =
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-storage = { module = "com.google.firebase:firebase-storage" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
+aws-android-sdk-s3 = { module = "com.amazonaws:aws-android-sdk-s3", version.ref = "awsS3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

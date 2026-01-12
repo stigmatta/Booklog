@@ -8,6 +8,11 @@
     <string name="tab_notes">Notes</string>
     <string name="tab_side_panel">Side panel</string>
     <string name="tab_info">Information</string>
+    <string name="tab_reviews">Reviews</string>
+    <string name="rating_summary">Rating Summary</string>
+    <string name="user_reviews">User Reviews</string>
+    <string name="no_reviews">No written reviews available.</string>
+    <string name="based_on_ratings">Based on %d ratings</string>
     <string name="label_title">TITLE</string>
     <string name="label_authors">AUTHORS</string>
     <string name="label_language">LANGUAGE</string>

@@ -18,8 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.rounded.StarOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -57,7 +55,9 @@ fun StatusSection(
 ) {
     var statusIndex by remember { mutableIntStateOf(initialStatus) }
     var progress by remember { mutableFloatStateOf(initialProgress) }
-    var rating by remember { mutableIntStateOf(initialRating) }
+    
+    // Kept for signature compatibility but not displayed in UI
+    val rating = initialRating 
 
     val isRead = statusIndex == 2
 
@@ -109,34 +109,6 @@ fun StatusSection(
                     },
                     modifier = Modifier.weight(1f)
                 )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = stringResource(R.string.your_rating),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                repeat(5) { index ->
-                    val isSelected = index < rating
-                    Icon(
-                        imageVector = if (isSelected) Icons.Default.Star else Icons.Rounded.StarOutline,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .clickable { rating = index + 1 },
-                        tint = if (isSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.outlineVariant
-                    )
-                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -49,6 +49,7 @@ import site.odintsov.booklog.ui.components.BookCardItem
 import site.odintsov.booklog.ui.components.BookSearchBar
 import site.odintsov.booklog.ui.components.BookTopAppBar
 import site.odintsov.booklog.ui.components.GenreFilterBar
+import site.odintsov.booklog.ui.components.LanguageFilterBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -66,6 +67,7 @@ fun BookScreen(
     val scope = rememberCoroutineScope()
     val isLoading by viewModel.isLoading
     val selectedGenre by viewModel.selectedGenre
+    val selectedLanguage by viewModel.selectedLanguage
     val searchString = selectedGenre.lowercase()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val addedMessage = stringResource(R.string.added_to_library)
@@ -163,6 +165,12 @@ fun BookScreen(
                     genres = viewModel.genres,
                     selectedGenre = searchString,
                     onGenreSelected = { genre -> viewModel.onGenreSelected(genre) }
+                )
+
+                LanguageFilterBar(
+                    languages = viewModel.languages,
+                    selectedLanguage = selectedLanguage,
+                    onLanguageSelected = { language -> viewModel.onLanguageSelected(language) }
                 )
 
                 Box(

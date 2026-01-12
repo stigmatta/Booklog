@@ -1,3 +1,5 @@
+package site.odintsov.booklog.data.google_api
+
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -11,7 +13,8 @@ interface GoogleBooksApi {
         @Query("q") query: String,
         @Query("orderBy") orderBy: String = "relevance",
         @Query("maxResults") maxResults: Int = 20,
-        @Query("printType") printType: String = "books"
+        @Query("printType") printType: String = "books",
+        @Query("langRestrict") langRestrict: String? = null
     ): GoogleBooksResponse
 
     companion object {

@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -107,11 +110,19 @@ fun BookCardItem(
                 }
             }
 
+            val (icon, tint) = when {
+                !book.isInLibrary -> Icons.Default.AddCircle to MaterialTheme.colorScheme.tertiary
+                book.status == 1 -> Icons.Default.Favorite to MaterialTheme.colorScheme.primary // Wishlist
+                book.status == 2 -> Icons.Default.CheckCircle to MaterialTheme.colorScheme.primary // Finished
+                book.status == 3 -> Icons.AutoMirrored.Filled.MenuBook to MaterialTheme.colorScheme.primary // Reading
+                else -> Icons.Default.AddCircle to MaterialTheme.colorScheme.tertiary
+            }
+
             IconButton(onClick = onAdd) {
                 Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = stringResource(R.string.added_to_library),
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = tint,
                     modifier = Modifier.size(28.dp)
                 )
             }

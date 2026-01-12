@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,8 +34,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +51,8 @@ import coil3.compose.AsyncImage
 import site.odintsov.booklog.R
 import site.odintsov.booklog.data.Book
 import site.odintsov.booklog.ui.BookViewModel
+import site.odintsov.booklog.ui.components.AddToLibraryDialog
+import site.odintsov.booklog.ui.components.BookReviews
 import site.odintsov.booklog.ui.components.GenreChip
 import site.odintsov.booklog.ui.components.InfoContent
 import site.odintsov.booklog.ui.components.StatusSection
@@ -62,6 +67,33 @@ fun BookDetailScreen(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var showDialog by remember { mutableStateOf(false) }
+    
+    // Retrieve combined rating if available, else use book's default
+    val combinedRatingPair = book?.let { viewModel.getCombinedRating(it.id) }
+    val displayRating = combinedRatingPair?.first ?: book?.averageRating ?: 0.0
+    val displayCount = combinedRatingPair?.second ?: book?.ratingsCount ?: 0
+
+    LaunchedEffect(book?.id) {
+        if (book != null) {
+            viewModel.loadReviews(book)
+        }
+    }
+
+    if (showDialog && book != null) {
+        AddToLibraryDialog(
+            onDismiss = { showDialog = false },
+            onConfirm = { selectedStatus ->
+                val updatedBook = book.copy(
+                    status = selectedStatus,
+                    isInLibrary = true,
+                    readingProgress = if (selectedStatus == 2) 1.0f else 0.0f
+                )
+                viewModel.updateBookInLibrary(updatedBook)
+                showDialog = false
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -162,37 +194,73 @@ fun BookDetailScreen(
                         onClick = { selectedTab = 1 },
                         text = { Text(stringResource(R.string.tab_info)) }
                     )
+                    Tab(
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        text = { Text(stringResource(R.string.tab_reviews)) }
+                    )
                 }
 
-                if (selectedTab == 0) {
-                    StatusSection(
-                        initialStatus = book.status,
-                        initialProgress = book.readingProgress,
-                        initialRating = book.rating,
-                        isInLibrary = book.isInLibrary,
-                        onSave = { newStatus, newProgress, newRating ->
-                            val updatedBook = book.copy(
-                                status = newStatus,
-                                readingProgress = newProgress,
-                                rating = newRating,
-                                isInLibrary = true
+                when (selectedTab) {
+                    0 -> {
+                        if (book.isInLibrary) {
+                            StatusSection(
+                                initialStatus = book.status,
+                                initialProgress = book.readingProgress,
+                                initialRating = book.rating,
+                                isInLibrary = book.isInLibrary,
+                                onSave = { newStatus, newProgress, newRating ->
+                                    val updatedBook = book.copy(
+                                        status = newStatus,
+                                        readingProgress = newProgress,
+                                        rating = newRating,
+                                        isInLibrary = true
+                                    )
+                                    viewModel.updateBookInLibrary(updatedBook)
+                                    onBack()
+                                },
+                                onDelete = {
+                                    val resetBook = book.copy(
+                                        status = 0,
+                                        isInLibrary = false,
+                                        readingProgress = 0f,
+                                        rating = 0
+                                    )
+                                    viewModel.updateBookInLibrary(resetBook)
+                                    onBack()
+                                }
                             )
-                            viewModel.updateBookInLibrary(updatedBook)
-                            onBack()
-                        },
-                        onDelete = {
-                            val resetBook = book.copy(
-                                status = 0,
-                                isInLibrary = false,
-                                readingProgress = 0f,
-                                rating = 0
-                            )
-                            viewModel.updateBookInLibrary(resetBook)
-                            onBack()
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(
+                                    onClick = { showDialog = true },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.btn_add_to_library),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    1 -> InfoContent(book)
+                    2 -> BookReviews(
+                        book = book.copy(averageRating = displayRating, ratingsCount = displayCount),
+                        reviews = viewModel.reviews,
+                        onAddReview = { rating, comment ->
+                            viewModel.submitReview(book, rating, comment)
                         }
                     )
-                } else {
-                    InfoContent(book)
                 }
             }
         } else {
@@ -202,4 +270,3 @@ fun BookDetailScreen(
         }
     }
 }
-

@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -22,13 +23,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import site.odintsov.booklog.data.AuthRepository
 import site.odintsov.booklog.data.BookRepository
 import site.odintsov.booklog.data.local.AppDatabase
+import site.odintsov.booklog.ui.AuthViewModel
 import site.odintsov.booklog.ui.BookViewModel
 import site.odintsov.booklog.ui.screens.BookDetailScreen
 import site.odintsov.booklog.ui.screens.BookScreen
 import site.odintsov.booklog.ui.screens.LibraryScreen
+import site.odintsov.booklog.ui.screens.LoginScreen
 import site.odintsov.booklog.ui.screens.ProfileScreen
+import site.odintsov.booklog.ui.screens.SignUpScreen
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalSharedTransitionApi::class)
@@ -37,6 +42,7 @@ class MainActivity : ComponentActivity() {
 
         val database = AppDatabase.getDatabase(this)
         val repository = BookRepository(database.bookDao())
+        val authRepository = AuthRepository(applicationContext)
         val app = application
 
         val viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -46,8 +52,14 @@ class MainActivity : ComponentActivity() {
             }
         })[BookViewModel::class.java]
 
-        viewModel.getPopularBooks()
+        val authViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return AuthViewModel(authRepository) as T
+            }
+        })[AuthViewModel::class.java]
 
+        viewModel.getPopularBooks()
 
         setContent {
             val systemDark = isSystemInDarkTheme()
@@ -56,10 +68,50 @@ class MainActivity : ComponentActivity() {
             val colors = if (isDarkTheme) darkColorScheme() else lightColorScheme()
             MaterialTheme(colorScheme = colors) {
                 val navController = rememberNavController()
+                val isLoggedIn = authRepository.currentUser != null
+                val startDest = if (isLoggedIn) "book_list" else "login"
+
+                LaunchedEffect(Unit) {
+                    if (isLoggedIn) {
+                        viewModel.syncLibrary()
+                    }
+                }
 
                 Surface(color = MaterialTheme.colorScheme.background) {
                     SharedTransitionLayout {
-                        NavHost(navController = navController, startDestination = "book_list") {
+                        NavHost(navController = navController, startDestination = startDest) {
+                            composable("login") {
+                                LoginScreen(
+                                    viewModel = authViewModel,
+                                    onLoginSuccess = {
+                                        viewModel.syncLibrary()
+                                        navController.navigate("book_list") {
+                                            popUpTo("login") { inclusive = true }
+                                        }
+                                    },
+                                    onNavigateToSignup = {
+                                        navController.navigate("signup")
+                                    }
+                                )
+                            }
+
+                            composable("signup") {
+                                SignUpScreen(
+                                    viewModel = authViewModel,
+                                    onSignupSuccess = {
+                                        viewModel.syncLibrary()
+                                        navController.navigate("book_list") {
+                                            popUpTo("login") { inclusive = true }
+                                        }
+                                    },
+                                    onNavigateToLogin = {
+                                        navController.navigate("login") {
+                                            popUpTo("signup") { inclusive = true }
+                                        }
+                                    }
+                                )
+                            }
+
                             composable("book_list") {
                                 BookScreen(
                                     viewModel = viewModel,
@@ -115,7 +167,17 @@ class MainActivity : ComponentActivity() {
                                     onNavigateToLibrary = {
                                         navController.navigate("library")
                                     },
-                                    onBack = { navController.popBackStack() }
+                                    onBack = { navController.popBackStack() },
+                                    authViewModel = authViewModel,
+                                    onLogout = {
+                                        authViewModel.logout()
+                                        navController.navigate("login") {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    },
+                                    onBookClick = { bookId ->
+                                        navController.navigate("book_details/$bookId")
+                                    }
                                 )
                             }
                         }
