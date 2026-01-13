@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import site.odintsov.booklog.data.Book
 
-@Database(entities = [Book::class], version = 9, exportSchema = false)
+@Database(entities = [Book::class], version = 10, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun bookDao(): BookDao

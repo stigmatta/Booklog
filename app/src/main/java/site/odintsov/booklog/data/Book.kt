@@ -1,8 +1,10 @@
 package site.odintsov.booklog.data
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Keep
 @Entity(tableName = "books")
 data class Book(
     @PrimaryKey val id: String = "",

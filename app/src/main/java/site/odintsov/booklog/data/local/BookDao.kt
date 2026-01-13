@@ -47,6 +47,9 @@ interface BookDao {
     @Query("UPDATE books SET isInLibrary = 0, status = 0, readingProgress = 0.0, rating = 0")
     suspend fun resetAllBooks()
 
+    @Query("DELETE FROM books")
+    suspend fun nukeAllBooks()
+
     @Query("SELECT * FROM books WHERE isInLibrary = 1")
     fun getLibraryBooks(): LiveData<List<Book>>
 }

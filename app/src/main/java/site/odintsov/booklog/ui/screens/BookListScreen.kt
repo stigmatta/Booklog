@@ -31,6 +31,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,7 @@ fun BookScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
+
     val books by viewModel.allBooks.observeAsState(initial = emptyList())
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -78,7 +80,12 @@ fun BookScreen(
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedBookForDialog by remember { mutableStateOf<Book?>(null) }
-
+    LaunchedEffect(Unit) {
+        if (books.isEmpty()) {
+            val initialQuery = selectedGenre.ifEmpty { "Fiction" }
+            viewModel.getPopularBooks(initialQuery)
+        }
+    }
     if (showDialog && selectedBookForDialog != null) {
         AddToLibraryDialog(
             onDismiss = { showDialog = false },
@@ -142,7 +149,12 @@ fun BookScreen(
                     "Українська" to "uk"
                 )
 
-                val currentLanguageCode = AppCompatDelegate.getApplicationLocales()[0]?.language ?: "en"
+                val appLocales = AppCompatDelegate.getApplicationLocales()
+                val currentLanguageCode = if (!appLocales.isEmpty) {
+                    appLocales[0]?.language
+                } else {
+                    java.util.Locale.getDefault().language
+                } ?: "en"
 
                 languages.forEach { (name, code) ->
                     NavigationDrawerItem(

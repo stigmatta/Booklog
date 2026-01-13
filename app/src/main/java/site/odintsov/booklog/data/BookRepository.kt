@@ -32,6 +32,13 @@ class BookRepository(private val bookDao: BookDao) {
         return "en"
     }
 
+    suspend fun clearLocalDataAndLogout() {
+        withContext(Dispatchers.IO) {
+            bookDao.nukeAllBooks()
+            auth.signOut()
+        }
+    }
+
     suspend fun fetchPopularBooks(query: String) {
 
         val currentLang = getSystemLanguage()
@@ -138,6 +145,8 @@ class BookRepository(private val bookDao: BookDao) {
         val userId = auth.currentUser?.uid ?: return
         withContext(Dispatchers.IO) {
             try {
+                bookDao.nukeAllBooks()
+
                 val snapshot = firestore.collection("users")
                     .document(userId)
                     .collection("books")

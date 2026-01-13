@@ -170,9 +170,9 @@ fun BookDetailScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        Row {
+                        Column {
                             GenreChip(stringArrayResource(R.array.book_genres)[0])
-                            Spacer(Modifier.width(4.dp))
+                            Spacer(Modifier.height(4.dp))
                             GenreChip(stringArrayResource(R.array.book_genres)[1])
                         }
                     }

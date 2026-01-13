@@ -1,21 +1,28 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# 1. Keep your Data Models and Entities strictly
+# This prevents R8 from stripping constructor parameters needed by Room/GSON/Firestore
+-keep @androidx.room.Entity class *
+-keep class site.odintsov.booklog.data.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# 2. Critical for Firestore Mapping
+# Firestore needs the setters/getters and the empty constructor to remain intact
+-keepattributes Signature, Exceptions, *Annotation*
+-keepclassmembers class site.odintsov.booklog.data.** {
+    @com.google.firebase.firestore.PropertyName <fields>;
+    @com.google.firebase.firestore.PropertyName <methods>;
+    public <init>(...);
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 3. Retrofit / GSON specifics
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 4. Retrofit & GSON: Ensure JSON mapping doesn't break
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+
+# 5. General Kotlin: Handle the 'no members match' issue by being less specific
+-keepnames class kotlinx.coroutines.** { *; }
